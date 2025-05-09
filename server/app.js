@@ -4,6 +4,24 @@ const mongoose = require("mongoose");
 const userRoutes = require("./routes/userRoutes")
 
 const app = express();
+app.use(cors());
+
+const axios = require("axios");
+
+app.get("/api/avatar/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const response = await axios.get(`https://api.multiavatar.com/${id}`, {
+      headers: { Accept: "image/svg+xml" },
+    });
+    res.setHeader("Content-Type", "image/svg+xml");
+    res.send(response.data);
+  } catch (error) {
+    console.error("Avatar fetch error:", error.message);
+    res.status(500).send("Error fetching avatar");
+  }
+});
+
 require("dotenv").config();
 
 app.use(cors());
