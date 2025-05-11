@@ -31,15 +31,18 @@ export default function SetAvatar() {
     const setProfilePicture = async() => {
         if(selectedAvatar === undefined){
             toast.error("Please select an Avatar", toastOptions);
+            return;
         }
 
-        else{
-            const user = await JSON.parse(localStorage.getItem("chat-app-user"));
+        try{
+            const user = JSON.parse(localStorage.getItem("chat-app-user"));
             const {data} = await axios.post(`${setAvatarRoute}/${user._id}`, {
                 image: avatars[selectedAvatar],
             });
 
-            if(data.isSet){
+            console.log("Avatar set response:", data);
+
+            if(data.isSet || data.status){
                 user.isAvatarImageSet = true;
                 user.avatarImage = data.image;
                 localStorage.setItem("chat-app-user", JSON.stringify(user));
@@ -50,6 +53,11 @@ export default function SetAvatar() {
                 toast.error("Error setting avatar. Please try again", toastOptions);
             }
         }
+        catch(err){
+            console.error("Error setting avatar:", err);
+            toast.error("Something went wrong. Please try again.", toastOptions);
+        }
+
     };
     useEffect(() => {
         const fetchAvatars = async () => {
